@@ -1,14 +1,15 @@
-#Requires -RunAsAdministrator 
+#Requires -RunAsAdministrator
 #Requires -Version 6
-
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
     [ValidateSet('Default', 'Flat', 'Mini')]
-    [string] $Layout = 'Mini',
+    [string] $Layout = 'mini',
     [Parameter()]
     [switch] $PreRelease
 )
+
+(New-Object System.Net.WebClient).Downloadfile("https://raw.githubusercontent.com/andreivlarox/windowsterminal-shell/master/helpers/settings.json", "D:\Test\Terminal Open Here\settings.json")
 
 function Generate-HelperScript(
         # The cache folder
@@ -231,7 +232,6 @@ function GetActiveProfiles(
         Write-Error "Couldn't find profiles. Please run Windows Terminal at least once after installing it. Exit."
         exit 1
     }
-
     $settings = Get-Content $file | Out-String | ConvertFrom-Json
     if ($settings.profiles.PSObject.Properties.name -match "list") {
         $list = $settings.profiles.list
@@ -240,6 +240,16 @@ function GetActiveProfiles(
     }
 
     return $list | Where-Object { -not $_.hidden} | Where-Object { ($null -eq $_.source) -or -not ($settings.disabledProfileSources -contains $_.source) }
+}
+
+#Downloads Settings from Github
+if ($isPreview){
+$file = "$env:LocalAppData\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json"
+(New-Object System.Net.WebClient).Downloadfile("https://raw.githubusercontent.com/andreivlarox/windowsterminal-shell/master/helpers/settings.json", $file)
+} 
+else {
+$file = "$env:LocalAppData\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+(New-Object System.Net.WebClient).Downloadfile("https://raw.githubusercontent.com/andreivlarox/windowsterminal-shell/master/helpers/settings.json", $file)
 }
 
 function GetProfileIcon (
