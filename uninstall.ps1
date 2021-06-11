@@ -4,7 +4,7 @@
 param(
     [Parameter(Position = 0)]
     [ValidateSet('Default', 'Flat', 'Mini')]
-    [string] $Layout = 'Default',
+    [string] $Layout = 'Mini',
     [Parameter()]
     [switch] $PreRelease
 )
