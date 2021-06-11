@@ -11,7 +11,13 @@
    > Quickest way to run the latest script from GitHub at an elevated PowerShell 7 console is
 
    > ``` powershell
-   > Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/lextm/windowsterminal-shell/master/install.ps1'))
+   > Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/andreivlarox/windowsterminal-shell/master/install.ps1'))
+   > ```
+
+   > Quickest way to run the latest UNINSTALL script from GitHub at an elevated PowerShell 7 console is
+
+   > ``` powershell
+   > Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/andreivlarox/windowsterminal-shell/master/uninstall.ps1'))
    > ```
 
 Now the menu items are added to Windows Explorer context menu.
