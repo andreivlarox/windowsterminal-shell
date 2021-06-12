@@ -1,5 +1,14 @@
+
 #Requires -RunAsAdministrator
 #Requires -Version 6
+#-----------------------------------------------------------------------------------#
+#Created by lextm                                                                   #
+#https://github.com/lextm/windowsterminal-shell                                     #
+#                                                                                   #
+#Slightly modified by Andrei                                                        #
+#https://github.com/andreivlarox/windowsterminal-shell                              #
+#-----------------------------------------------------------------------------------#
+
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
@@ -8,8 +17,6 @@ param(
     [Parameter()]
     [switch] $PreRelease
 )
-
-(New-Object System.Net.WebClient).Downloadfile("https://raw.githubusercontent.com/andreivlarox/windowsterminal-shell/master/helpers/settings.json", "D:\Test\Terminal Open Here\settings.json")
 
 function Generate-HelperScript(
         # The cache folder
@@ -242,16 +249,6 @@ function GetActiveProfiles(
     return $list | Where-Object { -not $_.hidden} | Where-Object { ($null -eq $_.source) -or -not ($settings.disabledProfileSources -contains $_.source) }
 }
 
-#Downloads Settings from Github
-if ($isPreview){
-$file = "$env:LocalAppData\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json"
-(New-Object System.Net.WebClient).Downloadfile("https://raw.githubusercontent.com/andreivlarox/windowsterminal-shell/master/helpers/settings.json", $file)
-} 
-else {
-$file = "$env:LocalAppData\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-(New-Object System.Net.WebClient).Downloadfile("https://raw.githubusercontent.com/andreivlarox/windowsterminal-shell/master/helpers/settings.json", $file)
-}
-
 function GetProfileIcon (
     [Parameter(Mandatory=$true)]
     $profile,
@@ -476,4 +473,38 @@ Write-Host "Use $Layout layout."
 
 CreateMenuItems $executable $Layout $PreRelease
 
-Write-Host "Windows Terminal installed to Windows Explorer context menu."
+## Setup the user prompt for settings.json download
+$yesdescription = "Downloads and imports the Windows Terminal settings file from https://raw.githubusercontent.com/andreivlarox/windowsterminal-shell/master/helpers/settings.json"
+$nodescription = "Skips the download and importing of the settings file from Github."
+$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes", $yesdescription
+$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No", $nodescription
+$options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
+
+if ($isPreview){
+$file = "$env:LocalAppData\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json"
+$backupfile = "$env:LocalAppData\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState\settings.json_BACKUP"
+} 
+else {
+$file = "$env:LocalAppData\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+$backupfile = "$env:LocalAppData\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json_BACKUP"
+}
+
+## User prompt for settings.json download
+$title = "Settings" 
+$message = "Do you want to import the settings.json file from Github?"
+$result = $host.ui.PromptForChoice($title, $message, $options, 0)
+switch ($result) {
+  0{
+    if (Test-Path $file) {
+        Copy-Item $file -Destination $backupfile
+        Write-Host "Your original settings file was backed up as $backupfile"
+    }
+    (New-Object System.Net.WebClient).Downloadfile("https://raw.githubusercontent.com/andreivlarox/windowsterminal-shell/master/helpers/settings.json", $file)
+    Write-Host "Windows Terminal installed to Windows Explorer context menu."
+	Write-Host "Settings file downloaded and imported from Github."
+  }
+  1{
+    Write-Host "Windows Terminal installed to Windows Explorer context menu."
+	Write-Host "Settings file download SKIPPED."
+  }
+}
